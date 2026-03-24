@@ -21,7 +21,7 @@ app.use(express.json());
 //credentials:true meaning?? => means that our server allows a browser(frontend) to include cookies on request 
 app.use(cors({origin:ENV.CLIENT_URL, credentials:true}))
 
-app.use("api/inngest", serve({client:inngest, functions}))
+app.use("/api/inngest", serve({client:inngest, functions}))
 
 // Health check endpoint — returns 200 OK if the server is running
 app.get("/health", (req, res) => {
@@ -55,12 +55,13 @@ if (ENV.NODE_ENV === 'production') {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT , () =>{
-      console.log("Server is running on PORT: " , ENV.PORT);
-    })
-
+    // ✅ Fixed: use process.env.PORT with fallback
+    const PORT = process.env.PORT || ENV.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log("Server is running on PORT: ", PORT);
+    });
   } catch (error) {
-    console.log("Error starting the server" , error)
+    console.log("Error starting the server", error);
   }
 }
 
