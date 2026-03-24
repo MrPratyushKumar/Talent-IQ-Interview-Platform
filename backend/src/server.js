@@ -6,7 +6,8 @@ import {serve} from "inngest/express"
 
 import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
-import { inngest } from "./lib/inngest.js";
+// CORRECT — import both
+import { inngest, functions } from "./lib/inngest.js";
 
 
 // Create an Express application instance
