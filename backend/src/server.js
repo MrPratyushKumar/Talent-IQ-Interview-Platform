@@ -2,12 +2,14 @@ import express from "express"
 import cors from "cors"
 import path from "path"
 import {serve} from "inngest/express"
-
+import { clerkMiddleware } from '@clerk/express' 
 
 import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
 // CORRECT — import both
 import { inngest, functions } from "./lib/inngest.js";
+import { protectRoute } from "./middleware/protectRoute.js"
+import chatRoutes from "./routes/chatRoutes.js"
 
 
 // Create an Express application instance
@@ -23,6 +25,10 @@ app.use(cors({origin:ENV.CLIENT_URL, credentials:true}))
 
 app.use("/api/inngest", serve({client:inngest, functions}))
 
+app.use(clerkMiddleware());//this will adds auth field to request object: req.auth( )
+
+app.use("/api/chat",chatRoutes)
+
 // Health check endpoint — returns 200 OK if the server is running
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -31,13 +37,8 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Books endpoint — placeholder route for book-related data
-app.get("/books", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "This is the books endpoint"
-  });
-});
+
+
 
 // Production-only block: serve the built React/Vite frontend
 if (ENV.NODE_ENV === 'production') {
