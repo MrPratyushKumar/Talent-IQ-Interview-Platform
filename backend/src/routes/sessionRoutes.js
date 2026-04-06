@@ -1,23 +1,35 @@
-import express from  "express";
+import express from "express";
 import { protectRoute } from "../middleware/protectRoute.js";
-import { createSession, endSession, getActiveSessions, getMyRecentSessions, getSessionById, joinSession } from "../controller/sessionController.js";
+import {
+  createSession,
+  endSession,
+  getActiveSessions,
+  getMyRecentSessions,
+  getSessionById,
+  joinSession,
+} from "../controller/sessionController.js";
 
 const router = express.Router();
 
-// create a Session 
-router.post("/",protectRoute , createSession);
+// 🔐 Apply auth middleware globally (cleaner)
+router.use(protectRoute);
 
-// Active sessions 
-router.get("/active",protectRoute , getActiveSessions);
+// ✅ CREATE SESSION
+router.post("/", createSession);
 
-// recent Sessions
-router.get("/my-recent",protectRoute , getMyRecentSessions);
+// ✅ GET ACTIVE SESSIONS
+router.get("/active", getActiveSessions);
 
-// get session by id  
-router.get("/:id",protectRoute , getSessionById);
-// join a session
-router.post("/:id/join",protectRoute , joinSession);
-//end the sessions 
-router.post("/:id/end",protectRoute , endSession);
+// ✅ GET MY RECENT SESSIONS
+router.get("/my-recent", getMyRecentSessions);
+
+// ✅ GET SESSION BY ID
+router.get("/:id", getSessionById);
+
+// ✅ JOIN SESSION
+router.post("/:id/join", joinSession);
+
+// ✅ END SESSION (better REST practice)
+router.patch("/:id/end", endSession);
 
 export default router;
