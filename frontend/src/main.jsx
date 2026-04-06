@@ -9,7 +9,8 @@ import {
 } from "@tanstack/react-query";
 
 import { ClerkProvider } from "@clerk/clerk-react";
-import { BrowserRouter } from "react-router";
+// ✅ CORRECT
+import { BrowserRouter } from "react-router-dom";
 
 // import your publishable key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
