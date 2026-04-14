@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 import { PROBLEMS } from "../data/problems";
@@ -35,7 +35,6 @@ function ProblemsPage() {
             >
               <div className="card-body">
                 <div className="flex items-center justify-between gap-4">
-                  {/* LEFT SIDE */}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -48,12 +47,15 @@ function ProblemsPage() {
                             {problem.difficulty}
                           </span>
                         </div>
-                        <p className="text-sm text-base-content/60"> {problem.category}</p>
+                        <p className="text-sm text-base-content/60">
+                          {problem.category}
+                        </p>
                       </div>
                     </div>
-                    <p className="text-base-content/80 mb-3">{problem.description.text}</p>
+                    <p className="text-base-content/80 mb-3">
+                      {problem.description.text}
+                    </p>
                   </div>
-                  {/* RIGHT SIDE */}
 
                   <div className="flex items-center gap-2 text-primary">
                     <span className="font-medium">Solve</span>
@@ -65,7 +67,7 @@ function ProblemsPage() {
           ))}
         </div>
 
-        {/* STATS FOOTER */}
+        {/* STATS */}
         <div className="mt-12 card bg-base-100 shadow-lg">
           <div className="card-body">
             <div className="stats stats-vertical lg:stats-horizontal">
@@ -78,10 +80,12 @@ function ProblemsPage() {
                 <div className="stat-title">Easy</div>
                 <div className="stat-value text-success">{easyProblemsCount}</div>
               </div>
+
               <div className="stat">
                 <div className="stat-title">Medium</div>
                 <div className="stat-value text-warning">{mediumProblemsCount}</div>
               </div>
+
               <div className="stat">
                 <div className="stat-title">Hard</div>
                 <div className="stat-value text-error">{hardProblemsCount}</div>
@@ -93,4 +97,5 @@ function ProblemsPage() {
     </div>
   );
 }
+
 export default ProblemsPage;
