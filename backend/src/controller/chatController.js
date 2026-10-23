@@ -12,6 +12,13 @@ import { chatClient } from "../lib/stream.js";
  */
 export async function getStreamToken(req, res) {
   try {
+    if (!chatClient) {
+      return res.status(503).json({
+        success: false,
+        message: "Stream is not configured on this server",
+      });
+    }
+
     /**
      * Generate Stream Token using Clerk ID
      *
@@ -41,7 +48,7 @@ export async function getStreamToken(req, res) {
       token,
       userId: req.user.clerkId,
       userName: req.user.name,
-      userImage: req.user.image,
+      userImage: req.user.profileImage,
     });
   } catch (error) {
     console.error("Error in getStreamToken controller:", error.message);
