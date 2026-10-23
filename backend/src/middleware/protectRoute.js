@@ -1,5 +1,37 @@
-import { requireAuth } from "@clerk/express";
+import { clerkClient, requireAuth } from "@clerk/express";
 import User from "../models/User.js";
+import { upsertStreamUser } from "../lib/stream.js";
+
+/**
+ * The Clerk webhook that normally creates our user row (the `sync-user`
+ * Inngest function) only fires where Clerk can reach it, so on a local dev
+ * machine - or in the seconds after signup in production - a valid token has
+ * no matching document. Create it here from the Clerk profile instead.
+ */
+async function createUserFromClerk(clerkId) {
+  const profile = await clerkClient.users.getUser(clerkId);
+
+  const doc = {
+    clerkId,
+    name:
+      [profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
+      profile.username ||
+      "Coder",
+    email:
+      profile.primaryEmailAddress?.emailAddress ||
+      `${clerkId}@clerk.users.noreply`,
+    profileImage: profile.imageUrl || "",
+  };
+
+  try {
+    const created = await User.create(doc);
+    await upsertStreamUser({ id: clerkId, name: created.name, image: created.profileImage });
+    return created;
+  } catch (error) {
+    if (error?.code === 11000) return User.findOne({ clerkId });
+    throw error;
+  }
+}
 
 /**
  * protectRoute - Authentication & Authorization Middleware
@@ -47,7 +79,11 @@ export const protectRoute = [
        * This links Clerk's identity to your app's user data.
        * If user doesn't exist in DB yet, return 404.
        */
-      const user = await User.findOne({ clerkId });
+      let user = await User.findOne({ clerkId });
+
+      if (!user) {
+        user = await createUserFromClerk(clerkId);
+      }
 
       if (!user) {
         return res.status(404).json({

@@ -22,7 +22,7 @@ export const upsertStreamUser = async (userData) => {
   if (!chatClient) return;
 
   try {
-    await chatClient.upsertUsers(userData);
+    await chatClient.upsertUsers([userData]);
     console.log("Stream user upserting successfully:", userData);
   } catch (error) {
     console.log("Error upserting Stream user", error);
