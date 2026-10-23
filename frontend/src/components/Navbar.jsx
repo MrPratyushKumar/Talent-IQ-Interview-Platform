@@ -62,7 +62,7 @@ function Navbar() {
           >
             <div className="flex items-center gap-x-2.5">
               <LayoutDashboardIcon className="size-4" />
-              <span className="font-medium hidden sm:inline">Dashboard</span>
+              <span className="font-medium hidden sm:inline">Dashbord</span>
             </div>
           </Link>
 
