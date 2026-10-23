@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { PROBLEMS } from "../data/problems";
 import Navbar from "../components/Navbar";
@@ -16,29 +16,25 @@ function ProblemPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [currentProblemId, setCurrentProblemId] = useState("two-sum");
+  const currentProblemId = PROBLEMS[id] ? id : "two-sum";
+  const currentProblem = PROBLEMS[currentProblemId];
+
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-  const [code, setCode] = useState(PROBLEMS[currentProblemId].starterCode.javascript);
+  const [code, setCode] = useState(currentProblem.starterCode.javascript);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
 
-  const currentProblem = PROBLEMS[currentProblemId];
-
-  // update problem when URL param changes
-  useEffect(() => {
-    if (id && PROBLEMS[id]) {
-      setCurrentProblemId(id);
-      setCode(PROBLEMS[id].starterCode[selectedLanguage]);
-      setOutput(null);
-    }
-  }, [id, selectedLanguage]);
-
-  const handleLanguageChange = (e) => {
-    const newLang = e.target.value;
-    setSelectedLanguage(newLang);
-    setCode(currentProblem.starterCode[newLang]);
+  // Reset the editor when the problem or language changes. Comparing during
+  // render (instead of in an effect) avoids a second, wasted render pass.
+  const editorKey = `${currentProblemId}:${selectedLanguage}`;
+  const [lastEditorKey, setLastEditorKey] = useState(editorKey);
+  if (editorKey !== lastEditorKey) {
+    setLastEditorKey(editorKey);
+    setCode(currentProblem.starterCode[selectedLanguage]);
     setOutput(null);
-  };
+  }
+
+  const handleLanguageChange = (e) => setSelectedLanguage(e.target.value);
 
   const handleProblemChange = (newProblemId) => navigate(`/problem/${newProblemId}`);
 

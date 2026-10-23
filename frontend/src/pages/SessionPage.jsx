@@ -45,7 +45,18 @@ function SessionPage() {
     : null;
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-  const [code, setCode] = useState(problemData?.starterCode?.[selectedLanguage] || "");
+  const [code, setCode] = useState("");
+
+  // Load the problem's starter code as soon as the session data arrives, and
+  // again whenever the language changes. Comparing during render instead of in
+  // an effect keeps React from doing an extra render pass.
+  const editorKey = problemData ? `${problemData.id}:${selectedLanguage}` : "";
+  const [lastEditorKey, setLastEditorKey] = useState("");
+  if (editorKey !== "" && editorKey !== lastEditorKey) {
+    setLastEditorKey(editorKey);
+    setCode(problemData.starterCode[selectedLanguage] || "");
+    setOutput(null);
+  }
 
   // auto-join session if user is not already a participant and not the host
   useEffect(() => {
@@ -64,21 +75,7 @@ function SessionPage() {
     if (session.status === "completed") navigate("/dashboard");
   }, [session, loadingSession, navigate]);
 
-  // update code when problem loads or changes
-  useEffect(() => {
-    if (problemData?.starterCode?.[selectedLanguage]) {
-      setCode(problemData.starterCode[selectedLanguage]);
-    }
-  }, [problemData, selectedLanguage]);
- 
-  const handleLanguageChange = (e) => {
-    const newLang = e.target.value;
-    setSelectedLanguage(newLang);
-    // use problem-specific starter code
-    const starterCode = problemData?.starterCode?.[newLang] || "";
-    setCode(starterCode);
-    setOutput(null);
-  };
+  const handleLanguageChange = (e) => setSelectedLanguage(e.target.value);
 
   const handleRunCode = async () => {
     setIsRunning(true);
@@ -131,8 +128,10 @@ function SessionPage() {
                             session?.difficulty
                           )}`}
                         >
-                          {session?.difficulty.slice(0, 1).toUpperCase() +
-                            session?.difficulty.slice(1) || "Easy"}
+                          {session?.difficulty
+                            ? session.difficulty[0].toUpperCase() +
+                              session.difficulty.slice(1)
+                            : "Unrated"}
                         </span>
                         {isHost && session?.status === "active" && (
                           <button
